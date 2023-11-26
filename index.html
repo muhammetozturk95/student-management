@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Management</title>
+</head>
+<body>
+
+  <h1>Student Management</h1>
+   <!-- Öğrenci Listesi Formu -->
+   <h2>Öğrenci Listesi</h2>
+   <button onclick="getStudents()">Get Students</button>
+   <ul id="studentList"></ul>
+
+<!-- Öğrenci Ekle Formu -->
+<h2>Öğrenci Ekle</h2>
+  <form id="addStudentForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="age">Age:</label>
+    <input type="number" id="age" name="age" required>
+
+    <label for="dob">Date of Birth:</label>
+    <input type="date" id="dob" name="dob" required>
+
+    <button type="button" onclick="addStudent()">Add Student</button>
+  </form>
+
+  <!-- Öğrenci Güncelle Formu -->
+  <h2>Öğrenci Güncelle</h2>
+  <form id="updateStudentForm">
+    <label for="updateId">Student ID:</label>
+    <input type="number" id="updateId" name="updateId" required>
+
+    <label for="updateName">Name:</label>
+    <input type="text" id="updateName" name="updateName" required>
+
+    <label for="updateEmail">Email:</label>
+    <input type="email" id="updateEmail" name="updateEmail" required>
+
+    <label for="updateAge">Age:</label>
+    <input type="number" id="updateAge" name="updateAge" required>
+
+    <label for="updateDob">Date of Birth:</label>
+    <input type="date" id="updateDob" name="updateDob" required>
+
+    <button type="button" onclick="updateStudent()">Update Student</button>
+  </form>
+
+  <!-- Öğrenci Sil Formu -->
+  <h2>Öğrenci Sil</h2>
+  <form id="deleteStudentForm">
+    <label for="deleteId">Student ID:</label>
+    <input type="number" id="deleteId" name="deleteId" required>
+
+    <button type="button" onclick="deleteStudent()">Delete Student</button>
+  </form>
+
+  <!-- Öğrenci Filtrele Formu -->
+<h2>Öğrenci Filtrele</h2>
+<form id="searchStudentForm">
+  <label for="searchId">ID:</label>
+  <input type="number" id="searchId" name="searchId">
+
+  <label for="searchName">Name:</label>
+  <input type="text" id="searchName" name="searchName">
+
+  <label for="searchEmail">Email:</label>
+  <input type="email" id="searchEmail" name="searchEmail">
+
+  <label for="searchAge">Age:</label>
+  <input type="number" id="searchAge" name="searchAge">
+
+  <label for="searchDob">Date of Birth:</label>
+  <input type="date" id="searchDob" name="searchDob">
+
+  <button type="button" onclick="searchStudents()">Search Students</button>
+  <ul id="filteredStudentList"></ul>
+</form>
+
+
+  <script>
+    async function getStudents() {
+      // GET isteği ile öğrenci listesini al
+      const response = await fetch('http://localhost:3000/api/v1/students');
+      const data = await response.json();
+
+      if (data.success) {
+        const studentList = document.getElementById('studentList');
+        studentList.innerHTML = ''; // Önceki listeyi temizle
+
+        data.students.forEach(student => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `ID: ${student.id}, Name: ${student.name}, Email: ${student.email}, Age: ${student.age}, DOB: ${student.dob}`;
+          studentList.appendChild(listItem);
+        });
+      } else {
+        console.error('Error getting students:', data.error);
+      }
+    }
+
+    async function addStudent() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const age = document.getElementById('age').value;
+      const dob = document.getElementById('dob').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/students', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, age, dob }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          console.log('Student added:', data.student);
+          // Başarılı bir şekilde eklendiyse, istediğiniz işlemleri burada yapabilirsiniz.
+        } else {
+          console.error('Error adding student:', data.error);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    }
+
+    async function updateStudent() {
+      const updateId = document.getElementById('updateId').value;
+      const updateName = document.getElementById('updateName').value;
+      const updateEmail = document.getElementById('updateEmail').value;
+      const updateAge = document.getElementById('updateAge').value;
+      const updateDob = document.getElementById('updateDob').value;
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/v1/students/${updateId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name: updateName, email: updateEmail, age: updateAge, dob: updateDob }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          console.log('Student updated:', data.student);
+          // Başarılı bir şekilde güncellendiyse, istediğiniz işlemleri burada yapabilirsiniz.
+        } else {
+          console.error('Error updating student:', data.error);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    }
+
+    async function deleteStudent() {
+      const deleteId = document.getElementById('deleteId').value;
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/v1/students/${deleteId}`, {
+          method: 'DELETE',
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          console.log('Student deleted:', 'id: ' + data.student.id, 'name: ' + data.student.name);
+          // Başarılı bir şekilde silindi ise, istediğiniz işlemleri burada yapabilirsiniz.
+        } else {
+          console.error('Error deleting student:', data.error);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+
+    async function searchStudents() {
+    const searchId = document.getElementById('searchId').value;
+    const searchName = document.getElementById('searchName').value;
+    const searchEmail = document.getElementById('searchEmail').value;
+    const searchAge = document.getElementById('searchAge').value;
+    const searchDob = document.getElementById('searchDob').value;
+
+    const queryParams = new URLSearchParams({
+      id: searchId,
+      name: searchName,
+      email: searchEmail,
+      age: searchAge,
+      dob: searchDob,
+    });
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/v1/students/search?${queryParams}`, {
+        method: 'GET',
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        const filteredStudentList = document.getElementById('filteredStudentList');
+        filteredStudentList.innerHTML = ''; // Önceki listeyi temizle
+
+        data.students.forEach(student => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `ID: ${student.id}, Name: ${student.name}, Email: ${student.email}, Age: ${student.age}, DOB: ${student.dob}`;
+          filteredStudentList.appendChild(listItem);
+        });
+      } else {
+        console.error('Error searching students:', data.error);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+    }
+  }
+    
+  </script>
+
+</body>
+</html>
