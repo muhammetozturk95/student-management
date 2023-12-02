@@ -5,6 +5,11 @@ const getStudents = async (req, res) => {
     const result = await pool.query('SELECT * FROM students');
     const students = result.rows;
     res.json({ success: true, students });
+    
+    Object.keys(students[0]).forEach(key => {
+        const valueType = typeof students[0][key];
+        console.log(`${key}: ${valueType}`);
+      });
   } catch (error) {
     console.error('Error getting students:', error);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
@@ -64,33 +69,40 @@ const deleteStudent = async (req, res) => {
 const searchStudents = async (req, res) => {
     try {
       const { id, name, email, age, dob } = req.query;
-  
+      
+      
       let queryString = 'SELECT * FROM students WHERE 1=1';
-      const queryParams = [];
+      let queryParams = [];
   
       // Filtreleme koşullarını oluştur
-      if (id) {
-        queryString += ' AND id = $1';
-        queryParams.push(id);
+        if (id) { 
+            queryString += ` AND id = $${queryParams.length + 1}`;
+            queryParams.push(id);
       }
+     
       if (name) {
-        queryString += ' AND name ILIKE $2';
+        
+        queryString += ` AND name ILIKE $${queryParams.length + 1}`;
         queryParams.push(`%${name}%`);
-      }
+      };
+      
       if (email) {
-        queryString += ' AND email ILIKE $3';
+        
+        queryString += ` AND email ILIKE $${queryParams.length + 1}`;
         queryParams.push(`%${email}%`);
       }
       if (age) {
-        queryString += ' AND age = $4';
+        
+        queryString += ` AND age = $${queryParams.length + 1}`;
         queryParams.push(age);
       }
       if (dob) {
-        queryString += ' AND dob = $5';
+        
+        queryString += ` AND dob = $${queryParams.length + 1}`;
         queryParams.push(dob);
       }
 
-      console.log('SQL Query:', queryString, 'Params:', queryParams);
+      console.log('SQL Query:', queryString, 'Params:', queryParams, 'req.query: ', req.query);
   
       // Sorguyu çalıştır
       const result = await pool.query(queryString, queryParams);

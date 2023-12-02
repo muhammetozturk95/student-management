@@ -15,6 +15,6 @@ router.put('/students/:id', controller.updateStudent);
 router.delete('/students/:id', controller.deleteStudent);
 
 // Öğrenci arama
-router.get('/students/search?', controller.searchStudents);
+router.get('/students/search', controller.searchStudents);
 
 module.exports = router;

@@ -84,6 +84,8 @@
 </form>
 
 
+
+
   <script>
     async function getStudents() {
       // GET isteği ile öğrenci listesini al
@@ -203,6 +205,8 @@
       });
       const data = await response.json();
 
+      console.log(data)
+
       if (data.success) {
         const filteredStudentList = document.getElementById('filteredStudentList');
         filteredStudentList.innerHTML = ''; // Önceki listeyi temizle
@@ -212,6 +216,13 @@
           listItem.textContent = `ID: ${student.id}, Name: ${student.name}, Email: ${student.email}, Age: ${student.age}, DOB: ${student.dob}`;
           filteredStudentList.appendChild(listItem);
         });
+
+        document.getElementById('searchId').value = '';
+        document.getElementById('searchName').value = '';
+        document.getElementById('searchEmail').value = '';
+        document.getElementById('searchAge').value = '';
+        document.getElementById('searchDob').value = '';
+
       } else {
         console.error('Error searching students:', data.error);
       }
